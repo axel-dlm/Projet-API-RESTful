@@ -1,0 +1,252 @@
+### Tests Spécialisés - Scénarios Avancés
+### Fichier complémentaire pour tests spécifiques et scénarios complexes
+
+### ================================================================================
+### TESTS DE CHARGEMENT ET PERFORMANCE
+### ================================================================================
+
+### Test de pagination avec grande liste
+GET http://localhost:3000/api/v1/games?page=1&limit=50
+
+### Test de recherche avec caractères accentués
+GET http://localhost:3000/api/v1/games?title=Zelda&genre=Aventure
+
+### Test de tri multiple (par défaut puis par rating)
+GET http://localhost:3000/api/v1/games?sort=title:asc&sort=rating:desc
+
+### ================================================================================
+### TESTS D'INTÉGRATION HATEOAS
+### ================================================================================
+
+### Créer un jeu et suivre les liens HATEOAS
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "HATEOAS Test Game",
+  "platform": "Test Platform",
+  "rating": 8.0
+}
+
+### Utiliser le lien self du jeu créé (remplacer {{gameId}} par l'ID réel)
+GET http://localhost:3000/api/v1/games/{{gameId}}
+
+### Utiliser le lien update pour modifier
+PATCH http://localhost:3000/api/v1/games/{{gameId}}
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "rating": 9.0
+}
+
+### Utiliser le lien delete pour supprimer
+DELETE http://localhost:3000/api/v1/games/{{gameId}}
+x-api-key: dev-secret-key
+
+### ================================================================================
+### TESTS DE CONTENT NEGOTIATION AVANCÉS
+### ================================================================================
+
+### Test Accept header avec qualité (q-factor)
+GET http://localhost:3000/api/v1/games
+Accept: application/json;q=0.9, application/xml;q=0.8
+
+### Test avec type MIME générique
+GET http://localhost:3000/api/v1/games
+Accept: */*
+
+### Test avec plusieurs types acceptés
+GET http://localhost:3000/api/v1/games
+Accept: text/html, application/xml, application/json
+
+### ================================================================================
+### TESTS I18N AVANCÉS
+### ================================================================================
+
+### Test avec cookie de langue
+GET http://localhost:3000/api/v1/games
+Cookie: lang=fr
+
+### Test combinaison query param et cookie
+GET http://localhost:3000/api/v1/games?lang=en
+Cookie: lang=fr
+
+### Test messages d'erreur en anglais
+GET http://localhost:3000/api/v1/games/999?lang=en
+
+### Test messages d'erreur en français
+GET http://localhost:3000/api/v1/games/999?lang=fr
+
+### ================================================================================
+### TESTS DE SÉCURITÉ ET AUTHENTIFICATION
+### ================================================================================
+
+### Test avec API key dans query string (non recommandé)
+POST http://localhost:3000/api/v1/games?api_key=dev-secret-key
+Content-Type: application/json
+
+{
+  "title": "Test API Key Query"
+}
+
+### Test avec API key invalide
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: invalid-key
+
+{
+  "title": "Test Invalid Key"
+}
+
+### Test accès en lecture sans API key (devrait fonctionner)
+GET http://localhost:3000/api/v1/games
+
+### Test modification sans API key (devrait échouer)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+
+{
+  "title": "Test No Key"
+}
+
+### ================================================================================
+### TESTS DE VALIDATION DÉTAILLÉS
+### ================================================================================
+
+### Test validation titre vide
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": ""
+}
+
+### Test validation titre null
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": null
+}
+
+### Test validation rating négatif
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Test Rating",
+  "rating": -1
+}
+
+### Test validation rating supérieur à 10
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Test Rating",
+  "rating": 11
+}
+
+### Test validation date invalide
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Test Date",
+  "releaseDate": "not-a-date"
+}
+
+### ================================================================================
+### TESTS DE CONCURRENCE (À EXÉCUTER SIMULTANÉMENT)
+### ================================================================================
+
+### Requête 1 - Création
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Concurrent Test 1"
+}
+
+### Requête 2 - Création simultanée
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Concurrent Test 2"
+}
+
+### Requête 3 - Lecture pendant création
+GET http://localhost:3000/api/v1/games
+
+### ================================================================================
+### TESTS D'INTÉGRATION AVEC AUTRES RESSOURCES
+### ================================================================================
+
+### Test avec données liées (si Developer model est implémenté)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Game with Developer",
+  "platform": "PC",
+  "developer": "Test Studio",
+  "rating": 8.5
+}
+
+### Vérifier que les associations fonctionnent
+GET http://localhost:3000/api/v1/games?title=Game%20with%20Developer
+
+### ================================================================================
+### TESTS DE MONITORING ET LOGGING
+### ================================================================================
+
+### Test avec headers personnalisés pour logging
+GET http://localhost:3000/api/v1/games
+X-Request-ID: test-123
+X-User-Agent: API-Test-Suite
+
+### Test avec timeout (simulé via client)
+GET http://localhost:3000/api/v1/games?page=1&limit=1
+
+### ================================================================================
+### VARIABLES ET ENVIRONNEMENTS DE TEST
+### ================================================================================
+
+@baseUrl = http://localhost:3000
+@apiVersion = v1
+@apiKey = dev-secret-key
+@contentType = application/json
+
+### Test avec variables d'environnement
+GET {{baseUrl}}/api/{{apiVersion}}/games
+
+### Test création avec variables
+POST {{baseUrl}}/api/{{apiVersion}}/games
+Content-Type: {{contentType}}
+x-api-key: {{apiKey}}
+
+{
+  "title": "Test with Variables",
+  "platform": "Variable Platform"
+}
+
+### Test différents environnements
+@stagingUrl = http://staging-api.example.com
+@prodUrl = http://api.example.com
+
+### Test staging (commenté - décommenter si environnement disponible)
+# GET {{stagingUrl}}/api/{{apiVersion}}/games
+
+### Test production (commenté - décommenter si environnement disponible)
+# GET {{prodUrl}}/api/{{apiVersion}}/games

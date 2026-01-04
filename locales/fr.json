@@ -1,0 +1,8 @@
+{
+  "api": {
+    "welcome": "API RESTful - Collection de jeux vidéo"
+  },
+  "error": {
+    "not_found": "Non trouvé"
+  }
+}

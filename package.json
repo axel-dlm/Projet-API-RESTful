@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "migrate": "node migrate.js",
+    "test": "node test-api.js"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +15,12 @@
   "dependencies": {
     "express": "^5.0.0",
     "sequelize": "^6.32.1",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "pg": "^8.11.0",
+    "pg-hstore": "^2.3.4",
+    "i18n": "^0.15.1",
+    "js-yaml": "^4.1.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

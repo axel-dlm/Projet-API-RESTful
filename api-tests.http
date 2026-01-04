@@ -1,0 +1,297 @@
+### API RESTful - Collection de Jeux Vidéo
+### Tests de tous les endpoints avec différents formats, HATEOAS, versioning et i18n
+
+### ================================================================================
+### 1. ENDPOINT RACINE
+### ================================================================================
+
+### GET / - Message de bienvenue (JSON par défaut)
+GET http://localhost:3000/
+
+### GET / - Message de bienvenue en anglais (i18n)
+GET http://localhost:3000/?lang=en
+
+### GET / - Message de bienvenue en français (i18n)
+GET http://localhost:3000/?lang=fr
+
+### ================================================================================
+### 2. LISTE DES JEUX (GET /api/v1/games)
+### ================================================================================
+
+### GET /api/v1/games - Liste complète (JSON)
+GET http://localhost:3000/api/v1/games
+
+### GET /api/v1/games - Liste en XML (content negotiation)
+GET http://localhost:3000/api/v1/games
+Accept: application/xml
+
+### GET /api/v1/games - Liste en YAML (content negotiation)
+GET http://localhost:3000/api/v1/games
+Accept: application/yaml
+
+### GET /api/v1/games - Pagination (page 1, limit 5)
+GET http://localhost:3000/api/v1/games?page=1&limit=5
+
+### GET /api/v1/games - Filtrage par titre
+GET http://localhost:3000/api/v1/games?title=Test
+
+### GET /api/v1/games - Filtrage par plateforme
+GET http://localhost:3000/api/v1/games?platform=PC
+
+### GET /api/v1/games - Filtrage par genre
+GET http://localhost:3000/api/v1/games?genre=Action
+
+### GET /api/v1/games - Tri par titre ascendant
+GET http://localhost:3000/api/v1/games?sort=title:asc
+
+### GET /api/v1/games - Tri par rating descendant
+GET http://localhost:3000/api/v1/games?sort=rating:desc
+
+### GET /api/v1/games - Combinaison filtres + pagination + tri
+GET http://localhost:3000/api/v1/games?title=Game&platform=PC&page=1&limit=10&sort=title:asc
+
+### ================================================================================
+### 3. CRÉATION D'UN JEU (POST /api/v1/games)
+### ================================================================================
+
+### POST /api/v1/games - Création basique (JSON)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "The Legend of Zelda: Breath of the Wild"
+}
+
+### POST /api/v1/games - Création complète (JSON)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Super Mario Odyssey",
+  "platform": "Nintendo Switch",
+  "genre": "Platformer",
+  "developer": "Nintendo",
+  "releaseDate": "2017-10-27",
+  "rating": 9.5,
+  "description": "Super Mario Odyssey is a 3D platformer game developed and published by Nintendo."
+}
+
+### POST /api/v1/games - Création avec réponse XML
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+Accept: application/xml
+x-api-key: dev-secret-key
+
+{
+  "title": "The Witcher 3: Wild Hunt",
+  "platform": "PC",
+  "genre": "RPG",
+  "developer": "CD Projekt Red",
+  "rating": 9.8
+}
+
+### POST /api/v1/games - Erreur validation (titre manquant)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "platform": "PC"
+}
+
+### POST /api/v1/games - Erreur API key manquante
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+
+{
+  "title": "Test Game"
+}
+
+### ================================================================================
+### 4. RÉCUPÉRATION D'UN JEU PAR ID (GET /api/v1/games/:id)
+### ================================================================================
+
+### GET /api/v1/games/1 - Récupération par ID (JSON)
+GET http://localhost:3000/api/v1/games/1
+
+### GET /api/v1/games/1 - Récupération par ID (XML)
+GET http://localhost:3000/api/v1/games/1
+Accept: application/xml
+
+### GET /api/v1/games/1 - Récupération par ID (YAML)
+GET http://localhost:3000/api/v1/games/1
+Accept: application/yaml
+
+### GET /api/v1/games/999 - Jeu inexistant (404)
+GET http://localhost:3000/api/v1/games/999
+
+### ================================================================================
+### 5. MISE À JOUR D'UN JEU (PATCH /api/v1/games/:id)
+### ================================================================================
+
+### PATCH /api/v1/games/1 - Mise à jour partielle (rating)
+PATCH http://localhost:3000/api/v1/games/1
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "rating": 9.0
+}
+
+### PATCH /api/v1/games/1 - Mise à jour complète
+PATCH http://localhost:3000/api/v1/games/1
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "The Legend of Zelda: Breath of the Wild - Updated",
+  "platform": "Nintendo Switch",
+  "genre": "Action-Adventure",
+  "rating": 9.7
+}
+
+### PATCH /api/v1/games/1 - Mise à jour avec réponse XML
+PATCH http://localhost:3000/api/v1/games/1
+Content-Type: application/json
+Accept: application/xml
+x-api-key: dev-secret-key
+
+{
+  "description": "Updated description for the game"
+}
+
+### PATCH /api/v1/games/999 - Jeu inexistant (404)
+PATCH http://localhost:3000/api/v1/games/999
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "rating": 8.0
+}
+
+### PATCH /api/v1/games/1 - Erreur API key manquante
+PATCH http://localhost:3000/api/v1/games/1
+Content-Type: application/json
+
+{
+  "rating": 8.0
+}
+
+### ================================================================================
+### 6. SUPPRESSION D'UN JEU (DELETE /api/v1/games/:id)
+### ================================================================================
+
+### DELETE /api/v1/games/1 - Suppression
+DELETE http://localhost:3000/api/v1/games/1
+x-api-key: dev-secret-key
+
+### DELETE /api/v1/games/999 - Jeu inexistant (404)
+DELETE http://localhost:3000/api/v1/games/999
+x-api-key: dev-secret-key
+
+### DELETE /api/v1/games/1 - Erreur API key manquante
+DELETE http://localhost:3000/api/v1/games/1
+
+### ================================================================================
+### 7. TESTS AVANCÉS - SCÉNARIOS COMPLETS
+### ================================================================================
+
+### Scénario 1: Création, lecture, mise à jour, suppression complète
+@gameId = 0
+
+### Créer un jeu
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Test Game Complete",
+  "platform": "PC",
+  "genre": "Test",
+  "rating": 7.5
+}
+
+### Récupérer le jeu créé (utiliser l'ID retourné)
+GET http://localhost:3000/api/v1/games/{{gameId}}
+
+### Mettre à jour le jeu
+PATCH http://localhost:3000/api/v1/games/{{gameId}}
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "rating": 8.5,
+  "description": "Updated test game"
+}
+
+### Supprimer le jeu
+DELETE http://localhost:3000/api/v1/games/{{gameId}}
+x-api-key: dev-secret-key
+
+### ================================================================================
+### 8. TESTS D'ERREURS ET EDGE CASES
+### ================================================================================
+
+### GET /api/v1/games - Paramètres de pagination invalides
+GET http://localhost:3000/api/v1/games?page=-1&limit=1000
+
+### POST /api/v1/games - Données invalides (rating hors limites)
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Invalid Game",
+  "rating": 15
+}
+
+### POST /api/v1/games - Titre trop long
+POST http://localhost:3000/api/v1/games
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "title": "Ce titre est beaucoup trop long et dépasse largement la limite de 200 caractères autorisés pour un titre de jeu vidéo dans cette API RESTful"
+}
+
+### PATCH /api/v1/games/1 - Date invalide
+PATCH http://localhost:3000/api/v1/games/1
+Content-Type: application/json
+x-api-key: dev-secret-key
+
+{
+  "releaseDate": "date-invalide"
+}
+
+### ================================================================================
+### 9. TESTS DE PERFORMANCE ET CHARGEMENT
+### ================================================================================
+
+### GET /api/v1/games - Liste avec limite élevée
+GET http://localhost:3000/api/v1/games?limit=100
+
+### GET /api/v1/games - Recherche avec caractères spéciaux
+GET http://localhost:3000/api/v1/games?title=Spécial&genre=Action-Adventure
+
+### ================================================================================
+### 10. TESTS AVEC VARIABLES D'ENVIRONNEMENT
+### ================================================================================
+
+### Utilisation de variables pour différents environnements
+@baseUrl = http://localhost:3000
+@apiKey = dev-secret-key
+
+### GET avec variable
+GET {{baseUrl}}/
+
+### POST avec variables
+POST {{baseUrl}}/api/v1/games
+Content-Type: application/json
+x-api-key: {{apiKey}}
+
+{
+  "title": "Game with Variables",
+  "platform": "Multi-platform"
+}

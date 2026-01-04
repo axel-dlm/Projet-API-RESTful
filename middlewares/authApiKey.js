@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
 
   const key = req.header('x-api-key') || req.query.api_key;
   if (!key || key !== API_KEY) {
-    return res.status(401).json({ error: 'Unauthorized: invalid or missing API key' });
+    return res.status(401).json({ error: 'Non autorisé : clé API invalide ou manquante' });
   }
   next();
 };

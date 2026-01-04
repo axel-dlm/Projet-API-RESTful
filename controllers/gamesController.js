@@ -1,10 +1,31 @@
 const { Game } = require('../models');
 
+const addHATEOASLinks = (game, req) => {
+  const baseUrl = `${req.protocol}://${req.get('host')}/api/v1/games`;
+  try {
+    const gameData = game.toJSON ? game.toJSON() : game;
+    return {
+      ...gameData,
+      _links: {
+        self: { href: `${baseUrl}/${gameData.id}` },
+        update: { href: `${baseUrl}/${gameData.id}`, method: 'PATCH' },
+        delete: { href: `${baseUrl}/${gameData.id}`, method: 'DELETE' }
+      }
+    };
+  } catch (err) {
+    console.error('Error in addHATEOASLinks:', err);
+    return game;
+  }
+};
+
 exports.createGame = async (req, res, next) => {
   try {
     const data = req.body;
     const game = await Game.create(data);
-    res.status(201).json(game);
+    res.status(201).json({
+      message: 'Game created',
+      data: addHATEOASLinks(game, req)
+    });
   } catch (err) {
     next(err);
   }
@@ -12,28 +33,9 @@ exports.createGame = async (req, res, next) => {
 
 exports.getGames = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, title, platform, genre, developer, rating_min, rating_max, sort } = req.query;
-    const where = {};
-    const { Op } = require('sequelize');
-
-    if (title) where.title = { [Op.like]: `%${title}%` };
-    if (platform) where.platform = platform;
-    if (genre) where.genre = genre;
-    if (developer) where.developer = developer;
-    if (rating_min) where.rating = { ...(where.rating || {}), [Op.gte]: parseFloat(rating_min) };
-    if (rating_max) where.rating = { ...(where.rating || {}), [Op.lte]: parseFloat(rating_max) };
-
-    const offset = (page - 1) * limit;
-
-    const order = [];
-    if (sort) {
-      const [field, dir] = sort.split(':');
-      const direction = dir && dir.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-      order.push([field, direction]);
-    }
-
-    const { count, rows } = await Game.findAndCountAll({ where, limit: parseInt(limit), offset: parseInt(offset), order });
-    res.json({ total: count, page: parseInt(page), limit: parseInt(limit), data: rows });
+    const games = await Game.findAll();
+    const data = games.map(game => addHATEOASLinks(game, req));
+    res.json({ data });
   } catch (err) {
     next(err);
   }
@@ -42,8 +44,8 @@ exports.getGames = async (req, res, next) => {
 exports.getGameById = async (req, res, next) => {
   try {
     const game = await Game.findByPk(req.params.id);
-    if (!game) return res.status(404).json({ error: 'Game not found' });
-    res.json(game);
+    if (!game) return res.status(404).json({ error: 'Not found' });
+    res.json(addHATEOASLinks(game, req));
   } catch (err) {
     next(err);
   }
@@ -52,9 +54,12 @@ exports.getGameById = async (req, res, next) => {
 exports.updateGame = async (req, res, next) => {
   try {
     const game = await Game.findByPk(req.params.id);
-    if (!game) return res.status(404).json({ error: 'Game not found' });
+    if (!game) return res.status(404).json({ error: 'Not found' });
     await game.update(req.body);
-    res.json(game);
+    res.json({
+      message: 'Updated',
+      data: addHATEOASLinks(game, req)
+    });
   } catch (err) {
     next(err);
   }
@@ -63,7 +68,7 @@ exports.updateGame = async (req, res, next) => {
 exports.deleteGame = async (req, res, next) => {
   try {
     const game = await Game.findByPk(req.params.id);
-    if (!game) return res.status(404).json({ error: 'Game not found' });
+    if (!game) return res.status(404).json({ error: 'Not found' });
     await game.destroy();
     res.status(204).end();
   } catch (err) {

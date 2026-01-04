@@ -1,0 +1,25 @@
+{
+  "game": {
+    "not_found": "Game not found",
+    "created": "Game created successfully",
+    "updated": "Game updated successfully",
+    "deleted": "Game deleted successfully"
+  },
+  "error": {
+    "unauthorized": "Unauthorized: invalid or missing API key",
+    "not_found": "Not found",
+    "validation": "Validation error",
+    "server": "Internal server error"
+  },
+  "validation": {
+    "title_required": "Field \"title\" is required and must be a non-empty string",
+    "title_invalid": "Field \"title\" must be a non-empty string when provided",
+    "title_too_long": "Field \"title\" must be at most 200 characters",
+    "rating_invalid": "Field \"rating\" must be a number when provided",
+    "rating_range": "Field \"rating\" must be between 0 and 10",
+    "release_date_invalid": "Field \"releaseDate\" must be a valid date (YYYY-MM-DD)"
+  },
+  "api": {
+    "welcome": "RESTful API - Video game collection"
+  }
+}
